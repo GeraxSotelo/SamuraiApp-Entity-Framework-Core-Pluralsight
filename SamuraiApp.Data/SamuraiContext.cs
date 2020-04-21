@@ -7,7 +7,7 @@ using System.Text;
 namespace SamuraiApp.Data
 {
     //DbContext will provide all the logic that EF Core is going to use to do it's change tracking and data base interaction tasks.
-    class SamuraiContext : DbContext
+    public class SamuraiContext : DbContext
     {
         //A DbContext needs to expose DbSets, which become wrappers to the different types that you'll interact with while you're using the context.
         public DbSet<Samurai> Samurais { get; set; }
