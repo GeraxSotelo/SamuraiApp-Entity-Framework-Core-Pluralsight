@@ -13,11 +13,22 @@ namespace ConsoleApp
             //This is just a quick hack. DO NOT use this in real software
             context.Database.EnsureCreated(); //This will cause EF Core to read the provider & connection string defined in the Context class, and then go look to see it the db exists
             //This is just a quick hack. DO NOT use this in real software
-            GetSamurais("Before Add:");
-            AddSamurai();
-            GetSamurais("After Add:");
+            //GetSamurais("Before Add:");
+            //AddSamurai();
+            //GetSamurais("After Add:");
+            InsertMultipleSamurais();
             Console.WriteLine("Press any key...");
             Console.ReadKey();
+        }
+
+        private static void InsertMultipleSamurais()
+        {
+            var samurai = new Samurai { Name = "Samurai-1" };
+            var samurai2 = new Samurai { Name = "Samurai-2" };
+            var samurai3 = new Samurai { Name = "Samurai-3" };
+            var samurai4 = new Samurai { Name = "Samurai-4" };
+            context.AddRange(samurai, samurai2, samurai3, samurai4);
+            context.SaveChanges();
         }
 
         private static void AddSamurai()
