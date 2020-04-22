@@ -31,6 +31,14 @@ namespace ConsoleApp
             context.SaveChanges();
         }
 
+        private static void InsertVariousTypes()
+        {
+            var samurai = new Samurai { Name = "Samurai-5" };
+            var clan = new Clan { ClanName = "Imperial Clan" };
+            context.AddRange(samurai, clan);
+            context.SaveChanges();
+        }
+
         private static void AddSamurai()
         {
             var samurai = new Samurai { Name = "Sampson" };
