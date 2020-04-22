@@ -13,6 +13,7 @@ namespace SamuraiApp.Data
         public DbSet<Samurai> Samurais { get; set; }
         public DbSet<Quote> Quotes { get; set; }
         public DbSet<Clan> Clans { get; set; }
+        public DbSet<Battle> Battles { get; set; }
         //EF Core will presume that the table names match these DbSet names.
 
         //The optionsBuilder can be used to configure options for the DbContext
@@ -28,8 +29,11 @@ namespace SamuraiApp.Data
         //he fluent mappings go into DbContext's onModelCreating method, which gets called internally at runtime when EF Core is working out what the data model looks like.
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<SamuraiBattle>().HasKey(s => new { s.Samurai, s.BattleId });
             //Using the modelBuilder object that EF Core has passed into the method, it's told that the SamuraiBattle Entity has a key that's composed from its SamuraiId & BattleId properites.
+            modelBuilder.Entity<SamuraiBattle>().HasKey(s => new { s.SamuraiId, s.BattleId });
+            
+            //Tell the modelBuilder that the Horse entity maps to a table called Horses
+            modelBuilder.Entity<Horse>().ToTable("Horses");
         }
     }
 }
