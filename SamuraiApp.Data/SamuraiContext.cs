@@ -20,7 +20,16 @@ namespace SamuraiApp.Data
         {
             //optionsBuilder expects a parameter that's the connection string
             optionsBuilder.UseSqlServer("Data Source = (localdb)\\MSSQLLocalDB; Initial Catalog = SamuraiAppData");
+            //The first time EF Core instantiates the SamuraiContext at runtime, it will trigger the OnConfiguring method, learn that it should be using the SQL Server provider, and be aware of the connection string. So it will be able to find the database and do its work.
         }
-        //The first time EF Core instantiates the SamuraiContext at runtime, it will trigger the OnConfiguring method, learn that it should be using the SQL Server provider, and be aware of the connection string. So it will be able to find the database and do its work.
+
+
+        //Using the Fluent API to specify the last critical detail of the many-to-many relationship.
+        //he fluent mappings go into DbContext's onModelCreating method, which gets called internally at runtime when EF Core is working out what the data model looks like.
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<SamuraiBattle>().HasKey(s => new { s.Samurai, s.BattleId });
+            //Using the modelBuilder object that EF Core has passed into the method, it's told that the SamuraiBattle Entity has a key that's composed from its SamuraiId & BattleId properites.
+        }
     }
 }
