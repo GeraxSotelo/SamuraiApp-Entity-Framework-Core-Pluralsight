@@ -127,7 +127,10 @@ namespace ConsoleApp
         private static void QueryAndUpdateBattle_Disconnected()
         {
             //In a disconnected scenario, requesting a battle in one context, modifying it, and then using a brand-new context to push the changes to the db.
+            //DbSet AsNoTracking() method in a LINQ query will ensure the DbContext doesn't create entity entry objects to track the results of the query.
+            //Useful when tracking is not needed
             var battle = _context.Battles.AsNoTracking().FirstOrDefault();
+            //The AsNoTracking() method returns a query, so you can't append DbSet methods such as Find() to AsNoTracking(), but you can still use LINQ methods
             battle.EndDate = new DateTime(1560, 06, 30);
 
             using (var newContextInstance = new SamuraiContext())
