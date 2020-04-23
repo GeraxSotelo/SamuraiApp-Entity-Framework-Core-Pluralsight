@@ -442,5 +442,23 @@ namespace ConsoleApp
             //then do a projection to pull back a type that has the Horse & the Samurai in it
             var horseWithSamurais = _context.Samurais.Where(s => s.Horse != null).Select(s => new { Horse = s.Horse, Samurai = s }).ToList();
         }
+
+        private static void GetSamuraiWithClan()
+        {
+            var samurai = _context.Samurais.Include(s => s.Clan).FirstOrDefault();
+        }
+
+        private static void GetClanWithSamurais()
+        {   
+            //Can't filter on the Samurais by expressing the ClanId because that property doesn't exist
+
+            //Can't include the Samurais on the Clan because there's no List of Samurais prop in the Clan type
+            //var clan = _context.Clans.Include(c=>c.???)
+
+            //First you need to get the Clan,
+            var clan = _context.Clans.Find(3);
+            //then query for the Samurais, drilling through the navigation property to the Clan ID and getting all that back
+            var samuraisForClan = _context.Samurais.Where(s => s.Clan.Id == 3).ToList();
+        }
     }
 }
