@@ -65,7 +65,15 @@ namespace ConsoleApp
             //var samurais = _context.Samurais.Where(s => s.Name == name).ToList();
 
             //% is a wildcard
-            var samurais = _context.Samurais.Where(s => EF.Functions.Like(s.Name, "J%")).ToList();
+            //var samurais = _context.Samurais.Where(s => EF.Functions.Like(s.Name, "J%")).ToList();
+
+            //var samurais = _context.Samurais.FirstOrDefault(s => s.Name == name);
+
+            //Find() is not a LINQ method. It's a DbSet method that will execute right away
+            //var samurais = _context.Samurais.Find(2);
+
+            //Last() or LastOrDefault() methods will only work if you first sort the query using the OrderBy LINQ method.
+            var samurais = _context.Samurais.OrderBy(s => s.Id).LastOrDefault(s => s.Name == name);
         }
     }
 }
