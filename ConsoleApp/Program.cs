@@ -22,7 +22,9 @@ namespace ConsoleApp
             //RetrieveAndUpdateSamurai();
             //RetrieveAndUpdateMultipleSamurais();
             //MultipleDatabaseOperations();
-            GetSamurais("Done");
+            //AddQuoteToExistingSamuraiWhileTracked();
+            EagerLoadSamuraiWithQuotes();
+            //GetSamurais("Done");
             Console.WriteLine("Press any key...");
             Console.ReadKey();
         }
@@ -66,6 +68,10 @@ namespace ConsoleApp
             foreach (var samurai in samurais)
             {
                 Console.WriteLine(samurai.Name);
+                foreach(var quote in samurai.Quotes)
+                {
+                Console.WriteLine(quote.Text);
+                }
             }
         }
 
@@ -200,6 +206,44 @@ namespace ConsoleApp
                 newContext.Quotes.Add(quote);
                 newContext.SaveChanges();
             }
+        }
+
+        private static void EagerLoadSamuraiWithQuotes()
+        {
+            //DbSet Include() method. LINQ ToList() exectution method
+            //Here, Quotes is the navigation property to include.
+            var samuraiWithQuotes = _context.Samurais.Include(s => s.Quotes).ToList();
+
+            var filteredSamuraiWithQuotes = _context.Samurais.Where(s => s.Name.Contains("Kikuchiyo")).Include(s => s.Quotes).FirstOrDefault();
+            //The Include() method always loads the entire set of related objects.It doesn't allow you to filter which related data is returned.
+        }
+
+        private static void ProjectSomeProperties()
+        {
+            //Select() method to specify which properties of an object we want returned.
+            //When returning more than 1 property, they'll have to be contained within a type
+            //LINQ lets you do that using the new keyword & placing the properties in curly braces. This is an "anonymous" type
+
+            //This will return a list of anonymous types whose properties are an int & a string
+            var someProperties = _context.Samurais.Select(s => new { s.Id, s.Name, s.Quotes.Count }).ToList();
+            //Anonymous types can't be tracked because the context doesn't comprehend that, but if it has props that are recognized Entity objects, they will be tracked
+        }
+
+        private static void ProjectSamuraisWithQuotes()
+        {
+            //var somePropertiesWithQuotes = _context.Samurais.Select(s => new { s.Id, s.Name, s.Quotes.Count }).ToList();
+
+            //filter on the Quotes
+            //var somePropertiesWithQuotes = _context.Samurais
+            //    .Select(s => new { s.Id, s.Name, HungryQuotes = s.Quotes.Where(q => q.Text.Contains("hungry")) })
+            //    .ToList();
+
+            //Get full samurais & a filtered full list of quotes
+            var samuraisWithHungryQuotes = _context.Samurais
+                .Select(s => new { Samurai = s, HungryQuotes = s.Quotes.Where(q => q.Text.Contains("hungry")) })
+                .ToList();
+
+            var firstSamurai = samuraisWithHungryQuotes[0].Samurai.Name += " The Hungriest";
         }
     }
 }
