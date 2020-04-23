@@ -273,5 +273,14 @@ namespace ConsoleApp
             //This is not good. It will retrieve all the quote objects from the db & materialize them & then give you the count.
             var quoteCount = samurai.Quotes.Count();
         }
+
+        private static void FilteringWithRelatedData()
+        {
+            //Use Where() & Any() methods to compose query where the related data is used to filter or sort the main object
+            //Navigate thru the relationship in the where predicate
+            //Then do a subquery of the samurai's quotes, determining if any of the quotes contain the word hungry
+            var samurais = _context.Samurais.Where(s => s.Quotes.Any(q => q.Text.Contains("hungy"))).ToList();
+            //This will only return the samurai, not its quotes or horse or clan
+        }
     }
 }
