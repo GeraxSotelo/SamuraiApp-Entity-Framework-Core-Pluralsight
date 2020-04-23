@@ -405,5 +405,20 @@ namespace ConsoleApp
             //It will also recognize that Horse doesn't have an ID yet. It will set the state for the Horse to 'added'
             //Then it will get inserted into the db when SaveChanges() is called
         }
+
+        private static void ReplaceAHorse()
+        {
+            //If Samurai & its Horse is already in memory & its Horse is replaced with a new Horse object,
+            //EF Core will delete the old one from the db & then add the new one
+            //Because in this project, the constraints don't allow the Horse to exist without a Samurai
+            var samurai = _context.Samurais.Include(s => s.Horse).FirstOrDefault(s => s.Id == 2);
+            samurai.Horse = new Horse { Name = "Trigger" };
+            _context.SaveChanges();
+
+            //If trading a Horse, you can just set the Horse's SamuraiId to the ID of the new Samurai owner.
+
+            //If the Horse object isn't in memory, EF Core won't know to delete it,
+            //And it will just send the insert to the db & if there's a conflict with the unique constraint, the db will throw an exception
+        }
     }
 }
