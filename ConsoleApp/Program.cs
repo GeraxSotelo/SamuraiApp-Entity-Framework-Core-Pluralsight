@@ -360,5 +360,50 @@ namespace ConsoleApp
                 .Select(s => new { Samurai = s, Battles = s.SamuraiBattles.Select(sb => sb.Battle) })
                 .FirstOrDefault();
         }
+
+        private static void AddNewSamuraiWithHorse()
+        {
+            //EF Core first sends an INSERT statement from the Samurai, along with a query to return the db-generated ID.
+            var samurai = new Samurai { Name = "Kenichi" };
+            //EF Core takes that new ID, integrates it into an INSERT command for the new Horse, & sets it to the value of the Horse's SamuraiId foreign key
+            samurai.Horse = new Horse { Name = "Silver" };
+            _context.Samurais.Add(samurai);
+            _context.SaveChanges();
+        }
+
+        private static void AddNewHorseToSamuraiUsingId()
+        {
+            //Add a new Horse to an already existing Samurai who doesn't have a horse yet
+
+            //Easiest path if the Samurai isn't in memory yet, but you have its ID
+            //Create a new Horse object and set its SamuraiId
+            var horse = new Horse { Name = "Scout", SamuraiId = 2 };
+            //Since there is no Horse DbSet, just use Add() to track it and save changes.
+            _context.Add(horse);
+            _context.SaveChanges();
+        }
+
+        private static void AddNewHorseToSamuraiObject()
+        {
+            //If Samurai is already in memory, just set the Horse object to the Horse navigation prop
+            var samurai = _context.Samurais.Find(2);
+            samurai.Horse = new Horse { Name = "Black Beauty" };
+            _context.SaveChanges();
+        }
+
+        private static void AddNewHorseToDisconnectedSamuraiObject()
+        {
+            //This can be done if you are disconnected as well.
+            var samurai = _context.Samurais.AsNoTracking().FirstOrDefault(s => s.Id == 2);
+            samurai.Horse = new Horse { Name = "Mr. Ed" };
+            using (var newContext = new SamuraiContext())
+            {
+                newContext.Attach(samurai);
+                newContext.SaveChanges();
+            }
+            //EF Core will see that the Samurai already has an ID & will mark it as unchanged
+            //It will also recognize that Horse doesn't have an ID yet. It will set the state for the Horse to 'added'
+            //Then it will get inserted into the db when SaveChanges() is called
+        }
     }
 }
