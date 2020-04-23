@@ -2,6 +2,7 @@
 using SamuraiApp.Data;
 using SamuraiApp.Domain;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace ConsoleApp
@@ -139,6 +140,65 @@ namespace ConsoleApp
                 //In a disconnected scenario, EF Core handles updates by passing in the values of all the object's properties
                 newContextInstance.Battles.Update(battle);
                 newContextInstance.SaveChanges();
+            }
+        }
+
+        private static void InsertNewSamuraiWithAQuote()
+        {
+            var samurai = new Samurai { Name = "Kambei Shimada", 
+                                        Quotes = new List<Quote> { new Quote { Text = "I've come to save you" } } };
+            _context.Samurais.Add(samurai);
+            _context.SaveChanges();
+        }
+
+        private static void InsertNewSamuraiWithManyQuotes()
+        {
+            var samurai = new Samurai
+            {
+                Name = "Kyuzo",
+                Quotes = new List<Quote> { new Quote { Text = "Watch out for my sword!" }, new Quote { Text = "Oh well!" } }
+            };
+            _context.Samurais.Add(samurai);
+            _context.SaveChanges();
+        }
+
+        private static void AddQuoteToExistingSamuraiWhileTracked()
+        {
+            var samurai = _context.Samurais.FirstOrDefault();
+            samurai.Quotes.Add(new Quote { Text = "I bet you're happy I saved you" });
+            _context.SaveChanges();
+        }
+
+        private static void AddQuoteToExistingSamuraiNotTracked(int samuraiId)
+        {
+            //New DbContext in disconnected scenario
+            var samurai = _context.Samurais.Find(samuraiId); 
+            samurai.Quotes.Add(new Quote { Text = "I'm hungry" });
+
+            using (var newContext = new SamuraiContext())
+            {
+                //DbSet Update() method to start tracking the graph
+                //But using Update() here is a performance issue because an update command gets sent even though the object's direct props were not edited
+                //newContext.Samurais.Update(samurai); 
+
+                //The Attach() method connects the object and sets its state to unmodified.
+                newContext.Samurais.Attach(samurai); //The Quote still gets inserted, but there is no update command being sent
+                newContext.SaveChanges();
+            }
+            //EF Core sees that the samurai already has an ID and determines that the quote must be new because it doesn't have an ID.
+            //Its default behavior is to assume that the quote's foreign key value should be the value of the Samurai ID because they're connected.
+        }
+
+        private static void AddQuoteToExistingSamuraiNotTracked_Easy(int samuraiId)
+        {
+            //Easier way is to set the foreign key on the quote.
+            var quote = new Quote { Text = "I'm hungry again", SamuraiId = samuraiId };
+
+            using (var newContext = new SamuraiContext())
+            {
+                //Add to the Quotes DbSet
+                newContext.Quotes.Add(quote);
+                newContext.SaveChanges();
             }
         }
     }
