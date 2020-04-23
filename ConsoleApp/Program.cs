@@ -245,5 +245,33 @@ namespace ConsoleApp
 
             var firstSamurai = samuraisWithHungryQuotes[0].Samurai.Name += " The Hungriest";
         }
+
+        private static void ExplicitLoadQuotes()
+        {
+            //Explicitly retrieve related data for objects already in memory.
+            //You can only load from a single object, so it can't be used for a list of Samurais
+            var samurai = _context.Samurais.FirstOrDefault(s => s.Name.Contains("Kikuchiyo"));
+            //Selecting all of the quotes with the samurai id
+            _context.Entry(samurai).Collection(s => s.Quotes).Load(); //Quotes is a collection property
+            _context.Entry(samurai).Reference(s => s.Horse).Load(); //Horse is a reference property
+
+            //can also filter
+            var hungryQuotes = _context.Entry(samurai).Collection(b => b.Quotes).Query().Where(q => q.Text.Contains("hungry")).ToList();
+        }
+
+        private static void LazyLoadQuotes()
+        {
+            //Lazy loading is not good for performance. Lazy loading has to be enabled
+            var samurai = _context.Samurais.FirstOrDefault(s => s.Name.Contains("Kikuchiyo"));
+
+            //This is okay. It will send 1 command to retrieve all the Quotes for that samurai, then iterate through them.
+            foreach(var q in samurai.Quotes)
+            {
+                Console.WriteLine(q.Text);
+            }
+
+            //This is not good. It will retrieve all the quote objects from the db & materialize them & then give you the count.
+            var quoteCount = samurai.Quotes.Count();
+        }
     }
 }
