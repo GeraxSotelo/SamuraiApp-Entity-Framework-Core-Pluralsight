@@ -282,5 +282,37 @@ namespace ConsoleApp
             var samurais = _context.Samurais.Where(s => s.Quotes.Any(q => q.Text.Contains("hungy"))).ToList();
             //This will only return the samurai, not its quotes or horse or clan
         }
+
+        private static void ModifyingRelatedDataWhenTracked()
+        {
+            //Use Include() to eager load a single samurai along with all of its quotes
+            var samurai = _context.Samurais.Include(s => s.Quotes).FirstOrDefault(s => s.Id == 2);
+            //Modify the text of the first quote
+            samurai.Quotes[0].Text = "Did you hear that?";
+            _context.SaveChanges();
+        }
+
+        private static void ModifyingRelatedDataWhenNotTracked()
+        {
+            //Disconnected scenario
+            //Use Include() to eager load a single samurai along with all of its quotes
+            var samurai = _context.Samurais.Include(s => s.Quotes).FirstOrDefault(s => s.Id == 2);
+            //Modify the text of the first quote
+            var quote = samurai.Quotes[0];
+            quote.Text = "Did you hear that again?";
+
+            using (var newContext = new SamuraiContext())
+            {
+                //Using DbSet Update() to tell the new context to start tracking the quote & mark it as modified
+                //newContext.Quotes.Update(quote); // This is not good because it will update everything in samurai object
+
+                //DbContext.Entry will focus specifically on the entry that you pass in & ignore anything else that might be attached to it.
+                //Entry's State prop can set the state of that entry to Modified, which is of the EntityState enums.
+                newContext.Entry(quote).State = EntityState.Modified;
+                //Now the change tracker is only tracking the quote
+                //SaveChanges() will only send an Update command to the db for the quote
+                newContext.SaveChanges();
+            }
+        }
     }
 }
