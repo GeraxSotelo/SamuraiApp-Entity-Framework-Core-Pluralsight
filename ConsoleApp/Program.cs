@@ -18,7 +18,10 @@ namespace ConsoleApp
             //AddSamurai();
             //GetSamurais("After Add:");
             //InsertMultipleSamurais();
-            QueryFilters();
+            //RetrieveAndUpdateSamurai();
+            //RetrieveAndUpdateMultipleSamurais();
+            //MultipleDatabaseOperations();
+            GetSamurais("Done");
             Console.WriteLine("Press any key...");
             Console.ReadKey();
         }
@@ -74,6 +77,29 @@ namespace ConsoleApp
 
             //Last() or LastOrDefault() methods will only work if you first sort the query using the OrderBy LINQ method.
             var samurais = _context.Samurais.OrderBy(s => s.Id).LastOrDefault(s => s.Name == name);
+        }
+
+        private static void RetrieveAndUpdateSamurai()
+        {
+            var samurai = _context.Samurais.FirstOrDefault();
+            samurai.Name += "San";
+            _context.SaveChanges();
+        }
+
+        private static void RetrieveAndUpdateMultipleSamurais()
+        {
+            //Can be used for pagination
+            var samurais = _context.Samurais.Skip(1).Take(3).ToList();
+            samurais.ForEach(s => s.Name += "San");
+            _context.SaveChanges();
+        }
+
+        private static void MultipleDatabaseOperations()
+        {
+            var samurai = _context.Samurais.FirstOrDefault();
+            samurai.Name += "San";
+            _context.Samurais.Add(new Samurai { Name = "Kikuchiyo" });
+            _context.SaveChanges();
         }
     }
 }
