@@ -410,7 +410,7 @@ namespace ConsoleApp
         {
             //If Samurai & its Horse is already in memory & its Horse is replaced with a new Horse object,
             //EF Core will delete the old one from the db & then add the new one
-            //Because in this project, the constraints don't allow the Horse to exist without a Samurai
+            //because in this project, the constraints don't allow the Horse to exist without a Samurai
             var samurai = _context.Samurais.Include(s => s.Horse).FirstOrDefault(s => s.Id == 2);
             samurai.Horse = new Horse { Name = "Trigger" };
             _context.SaveChanges();
@@ -418,7 +418,29 @@ namespace ConsoleApp
             //If trading a Horse, you can just set the Horse's SamuraiId to the ID of the new Samurai owner.
 
             //If the Horse object isn't in memory, EF Core won't know to delete it,
-            //And it will just send the insert to the db & if there's a conflict with the unique constraint, the db will throw an exception
+            //and it will just send the insert to the db & if there's a conflict with the unique constraint, the db will throw an exception
+        }
+
+        private static void GetSamuraisWithHorse()
+        {
+            var samurai = _context.Samurais.Include(s => s.Horse).ToList();
+        }
+
+        private static void GetHorseWithSamurai()
+        {
+            //Since we have neither a Horse DbSet nor a Samurai property in the Horse class,
+            //it won't be as easy to query for a Horse and load its Samurai
+
+            //When there is no DbSet, you have the option to query using the DbContext Set() method to start the query
+            var horseWithoutSamurai = _context.Set<Horse>().Find(3);
+
+            //Since there is no Samurai navigation prop in the Horse class, will have to find a way to bring back the Samurai at the same time.
+            //You can query for a Samurai & then drill through the relationship to filter on the Horse's ID property
+            var horseWithSamurai = _context.Samurais.Include(s => s.Horse).FirstOrDefault(s => s.Horse.Id == 3);
+
+            //Or first filter on Samurai's that have a Horse by making sure the Horse isn't null
+            //then do a projection to pull back a type that has the Horse & the Samurai in it
+            var horseWithSamurais = _context.Samurais.Where(s => s.Horse != null).Select(s => new { Horse = s.Horse, Samurai = s }).ToList();
         }
     }
 }
