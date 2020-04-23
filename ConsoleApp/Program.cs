@@ -314,5 +314,51 @@ namespace ConsoleApp
                 newContext.SaveChanges();
             }
         }
+
+        private static void JoinBattleAndSamurai()
+        {
+            //Samurai & Battle already exist & we have their IDs
+            //There is no DbSet for SamuraiBattle in SamuraiContext.cs
+            var sbJoin = new SamuraiBattle { SamuraiId = 1, BattleId = 3 };
+            //You can call Add,Attach, Update or Delete for entities that don't have a DbSet defined in the DB context
+            _context.Add(sbJoin);
+            _context.SaveChanges(); //pushes the SamuraiBattle into the db
+        }
+
+        private static void EnlistSamuraiIntoABattle()
+        {
+            var battle = _context.Battles.Find(1);
+            battle.SamuraiBattles.Add(new SamuraiBattle { SamuraiId = 21 });
+            //If changetracker is watching this, there's no need to specify the battle id.
+            //EF Core can figure that out when SaveChanges() is called
+            _context.SaveChanges();
+        }
+
+        private static void RemoveJoinBetweenSamuraiAndBattleSimple()
+        {
+            //Samurai & Battle already exist & we have their IDs
+            //Normally, retrieve a true object queried from the db to use with EF Core's Remove() method,
+            //but in this case, SamuraiBattle is so simple that it's safe to create it in memory without worrying about side effects
+            var join = new SamuraiBattle { BattleId = 1, SamuraiId = 2 };
+            _context.Remove(join);
+            _context.SaveChanges();
+        }
+
+        private static void GetSamuraiWithBattles()
+        {
+            //Using eager load
+            //Problem: with results, will still need to drill into each 1 of the samurai battles attached to the samurai to find the battle on the other end
+            var samuraiWithBattle = _context.Samurais
+                .Include(s => s.SamuraiBattles)
+                .ThenInclude(sb => sb.Battle)
+                .FirstOrDefault(samurai => samurai.Id == 2);
+
+            //Better solution
+            //Use a pojection. Then you can project a type that has the samurai as 1 prop & all of the battles for that samurai as another prop
+            var samuraiWithBattlesCleaner = _context.Samurais
+                .Where(s => s.Id == 2)
+                .Select(s => new { Samurai = s, Battles = s.SamuraiBattles.Select(sb => sb.Battle) })
+                .FirstOrDefault();
+        }
     }
 }
