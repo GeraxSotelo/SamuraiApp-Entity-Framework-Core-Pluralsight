@@ -117,5 +117,26 @@ namespace ConsoleApp
             _context.Samurais.Remove(samurai);
             _context.SaveChanges();
         }
+
+        private static void InsertBattle()
+        {
+            _context.Battles.Add(new Battle { Name="Battle of Okehazama", StartDate=new DateTime(1560, 05, 02), EndDate=new DateTime(1560, 06, 15) });
+            _context.SaveChanges();
+        }
+
+        private static void QueryAndUpdateBattle_Disconnected()
+        {
+            //In a disconnected scenario, requesting a battle in one context, modifying it, and then using a brand-new context to push the changes to the db.
+            var battle = _context.Battles.AsNoTracking().FirstOrDefault();
+            battle.EndDate = new DateTime(1560, 06, 30);
+
+            using (var newContextInstance = new SamuraiContext())
+            {
+                //DbSet Update() method. Context will start tracking the object then it will tell EF Core to mark the object as modified
+                //In a disconnected scenario, EF Core handles updates by passing in the values of all the object's properties
+                newContextInstance.Battles.Update(battle);
+                newContextInstance.SaveChanges();
+            }
+        }
     }
 }
