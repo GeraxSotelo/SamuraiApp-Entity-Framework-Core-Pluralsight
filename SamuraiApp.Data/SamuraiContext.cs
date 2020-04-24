@@ -15,6 +15,7 @@ namespace SamuraiApp.Data
         public DbSet<Quote> Quotes { get; set; }
         public DbSet<Clan> Clans { get; set; }
         public DbSet<Battle> Battles { get; set; }
+        public DbSet<SamuraiBattleStat> SamuraiBattleStats { get; set; }
         //EF Core will presume that the table names match these DbSet names.
 
             //filters to only show database commands and basic information detail
