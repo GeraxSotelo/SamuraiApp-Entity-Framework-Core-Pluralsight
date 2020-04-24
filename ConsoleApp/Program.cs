@@ -13,7 +13,7 @@ namespace ConsoleApp
         static void Main(string[] args)
         {
             //This is just a quick hack. DO NOT use this in real software
-            _context.Database.EnsureCreated(); //This will cause EF Core to read the provider & connection string defined in the Context class, and then go look to see it the db exists
+            //_context.Database.EnsureCreated(); //This will cause EF Core to read the provider & connection string defined in the Context class, and then go look to see it the db exists
             //This is just a quick hack. DO NOT use this in real software
             //GetSamurais("Before Add:");
             //AddSamurai();
@@ -23,10 +23,23 @@ namespace ConsoleApp
             //RetrieveAndUpdateMultipleSamurais();
             //MultipleDatabaseOperations();
             //AddQuoteToExistingSamuraiWhileTracked();
-            EagerLoadSamuraiWithQuotes();
+            //EagerLoadSamuraiWithQuotes();
             //GetSamurais("Done");
-            Console.WriteLine("Press any key...");
-            Console.ReadKey();
+            //Console.WriteLine("Press any key...");
+            //Console.ReadKey();
+
+            QuerySamuraiBattleStats();
+        }
+
+        private static void QuerySamuraiBattleStats()
+        {
+            var stats = _context.SamuraiBattleStats.ToList();
+            var firstStat = _context.SamuraiBattleStats.FirstOrDefault();
+            var sampsonStat = _context.SamuraiBattleStats.Where(s => s.Name == "Sampson").FirstOrDefault();
+            //The ChangeTracker has no clue about the data that gets returned when using DbSet methods due to keyless entities
+
+            //This makes no sense because there's no key
+            var findOne = _context.SamuraiBattleStats.Find(2);
         }
 
         private static void InsertMultipleSamurais()
