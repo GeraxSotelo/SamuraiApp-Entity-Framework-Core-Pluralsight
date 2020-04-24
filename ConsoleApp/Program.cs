@@ -28,6 +28,7 @@ namespace ConsoleApp
             //Console.WriteLine("Press any key...");
             //Console.ReadKey();
 
+            //Querying database views
             QuerySamuraiBattleStats();
         }
 
