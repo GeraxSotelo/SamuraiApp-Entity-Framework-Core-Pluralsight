@@ -70,6 +70,19 @@ namespace ConsoleApp
             var samurais = _context.Samurais.FromSqlRaw($"Select * from Samurais Where Name = '{name}'").ToList();
         }
 
+        private static void QueryingUsingFromRawSqlStoredProcedure()
+        {
+            var text = "Hungry";
+            var samurais = _context.Samurais.FromSqlRaw("EXEC dbo.SamuraisWhoSaidAWord {0}", text).ToList();
+        }
+
+        private static void InterpolatedRawSqlQueryStoredProcedure()
+        {
+            var text = "Hungry";
+            var samurais = _context.Samurais.FromSqlInterpolated($"EXEC dbo.SamuraisWhoSaidAWord {text}").ToList();
+        }
+
+
         private static void InsertMultipleSamurais()
         {
             //DbSet AddRange() method
