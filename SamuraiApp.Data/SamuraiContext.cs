@@ -42,6 +42,11 @@ namespace SamuraiApp.Data
             
             //Tell the modelBuilder that the Horse entity maps to a table called Horses
             modelBuilder.Entity<Horse>().ToTable("Horses");
+
+            //Configure context to be aware SamuraiBattleStats intentionally doesn't have a key so EF Core doesn't get upset
+            //Add ToView() so context is aware there's already a view, or else EF Core will think it needs to create a new db table 
+            modelBuilder.Entity<SamuraiBattleStat>().HasNoKey().ToView("SamuraiBattleStats");
+            //EF Core will never track entities marked with HasNoKey()
         }
     }
 }
