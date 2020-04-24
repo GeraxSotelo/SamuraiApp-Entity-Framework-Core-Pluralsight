@@ -29,7 +29,9 @@ namespace ConsoleApp
             //Console.ReadKey();
 
             //Querying database views
-            QuerySamuraiBattleStats();
+            //QuerySamuraiBattleStats();
+
+            QueryUsingRawSql();
         }
 
         private static void QuerySamuraiBattleStats()
@@ -41,6 +43,31 @@ namespace ConsoleApp
 
             //This makes no sense because there's no key
             var findOne = _context.SamuraiBattleStats.Find(2);
+        }
+
+        private static void QueryUsingRawSql()
+        {
+            //1 requirement with using FromSQL methods on the DbSet is the SQL needs to return data whose structure matches the entity represented by the DbSet
+            //Because these are DbSet methods, they can only be used for known entities
+            //You can't use the raw SQL query to return a type that's not known by the DbContext model
+
+            //var samurais = _context.Samurais.FromSqlRaw("Select * from Samurais").ToList();
+
+            var samurais = _context.Samurais.FromSqlRaw("Select Id, Name, ClanId from Samurais").Include(s => s.Quotes).ToList();
+        }
+
+        private static void QueryUsingRawSqlWithInterpolation()
+        {
+            string name = "Kikuchyo";
+            var samurais = _context.Samurais.FromSqlInterpolated($"Select * from Samurais Where Name = {name}").ToList();
+        }
+
+        private static void DANGERDANGERQueryUsingRawSqlWithInterpolation()
+        {
+            //Danger of SQL Injection Attack!
+            //If you pass an interpolated method into FromSqlRaw, you are in danger of SQL injection attacks!
+            string name = "Kikuchyo";
+            var samurais = _context.Samurais.FromSqlRaw($"Select * from Samurais Where Name = '{name}'").ToList();
         }
 
         private static void InsertMultipleSamurais()
