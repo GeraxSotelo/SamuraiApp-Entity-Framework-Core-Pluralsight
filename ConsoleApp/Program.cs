@@ -82,6 +82,17 @@ namespace ConsoleApp
             var samurais = _context.Samurais.FromSqlInterpolated($"EXEC dbo.SamuraisWhoSaidAWord {text}").ToList();
         }
 
+        private static void ExecuteSomeRawSql()
+        {
+            //REMEMBER to use parameters with SqlRaw methods
+            //DeleteQuotesForSamurai was created in Stored Procedures
+            var samuraiId = 5;
+            var x = _context.Database.ExecuteSqlRaw("EXEC DeleteQuotesForSamurai {0}", samuraiId);
+
+            samuraiId = 3;
+            _context.Database.ExecuteSqlInterpolated($"EXEC DeleteQuotesForSamurai {samuraiId}");
+        }
+
 
         private static void InsertMultipleSamurais()
         {
