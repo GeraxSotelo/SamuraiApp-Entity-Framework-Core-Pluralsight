@@ -18,7 +18,7 @@ namespace ConsoleApp
             //GetSamurais("Before Add:");
             //AddSamurai();
             //GetSamurais("After Add:");
-            //InsertMultipleSamurais();
+            InsertMultipleSamurais();
             //RetrieveAndUpdateSamurai();
             //RetrieveAndUpdateMultipleSamurais();
             //MultipleDatabaseOperations();
@@ -31,7 +31,7 @@ namespace ConsoleApp
             //Querying database views
             //QuerySamuraiBattleStats();
 
-            QueryUsingRawSql();
+            //QueryUsingRawSql();
         }
 
         private static void QuerySamuraiBattleStats()
@@ -97,14 +97,18 @@ namespace ConsoleApp
         private static void InsertMultipleSamurais()
         {
             //DbSet AddRange() method
-            var samurai = new Samurai { Name = "Samurai-1" };
-            var samurai2 = new Samurai { Name = "Samurai-2" };
-            var samurai3 = new Samurai { Name = "Samurai-3" };
-            var samurai4 = new Samurai { Name = "Samurai-4" };
+            //var samurai = new Samurai { Name = "Samurai-1" };
+            //var samurai2 = new Samurai { Name = "Samurai-2" };
+            //var samurai3 = new Samurai { Name = "Samurai-3" };
+            //var samurai4 = new Samurai { Name = "Samurai-4" };
             //Add to context.Samurais DbSet, so it's an in-memory collection of samurais that the context keeps track of
-            _context.AddRange(samurai, samurai2, samurai3, samurai4);
+            //_context.AddRange(samurai, samurai2, samurai3, samurai4);
             //Save the data that the context is tracking back to the db
-            _context.SaveChanges();
+            //_context.SaveChanges();
+
+            var _bizdata = new BusinessDataLogic();
+            var samuraiNames = new string[] { "Samson", "Tasha", "Number3", "Number4" };
+            var newSamuraisCreated = _bizdata.AddMultipleSamurais(samuraiNames);
         }
 
         private static void InsertVariousTypes()
