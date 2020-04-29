@@ -7,7 +7,7 @@ using SamuraiApp.Domain;
 
 namespace ConsoleApp
 {
-    class BusinessDataLogic
+    public class BusinessDataLogic
     {
         private SamuraiContext _context;
 
