@@ -23,5 +23,23 @@ namespace SamuraiApp.Tests
                 Assert.Equal(nameList.Count(), result);
             }
         }
+
+        [Fact]
+        public void CanInsertSingleSamurai()
+        {
+            var builder = new DbContextOptionsBuilder();
+            builder.UseInMemoryDatabase("InsertNewSamurai");
+
+            using(var context = new SamuraiContext(builder.Options))
+            {
+                var bizlogic = new BusinessDataLogic(context);
+                bizlogic.InsertNewSamurai(new Samurai());
+            }
+
+            using (var context2 = new SamuraiContext(builder.Options))
+            {
+                Assert.Equal(1, context2.Samurais.Count());
+            }
+        }
     }
 }
