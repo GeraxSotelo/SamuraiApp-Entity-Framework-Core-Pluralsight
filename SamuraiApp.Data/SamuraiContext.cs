@@ -18,6 +18,12 @@ namespace SamuraiApp.Data
         public DbSet<SamuraiBattleStat> SamuraiBattleStats { get; set; }
         //EF Core will presume that the table names match these DbSet names.
 
+        public SamuraiContext()
+        {}
+
+        public SamuraiContext(DbContextOptions options) : base(options) //Options CONSTRUCTOR
+        { }
+
             //filters to only show database commands and basic information detail
         public static readonly ILoggerFactory ConsoleLoggerFactory = LoggerFactory.Create(builder => {
             builder.AddFilter((category, level) => 
@@ -28,8 +34,15 @@ namespace SamuraiApp.Data
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             //optionsBuilder expects a parameter that's the connection string
-            optionsBuilder.UseLoggerFactory(ConsoleLoggerFactory).UseSqlServer("Data Source = (localdb)\\MSSQLLocalDB; Initial Catalog = SamuraiAppData");
+            // optionsBuilder.UseLoggerFactory(ConsoleLoggerFactory).UseSqlServer("Data Source = (localdb)\\MSSQLLocalDB; Initial Catalog = SamuraiAppData");
             //The first time EF Core instantiates the SamuraiContext at runtime, it will trigger the OnConfiguring method, learn that it should be using the SQL Server provider, and be aware of the connection string. So it will be able to find the database and do its work.
+
+            if(!optionsBuilder.IsConfigured)
+            {
+                //For tests
+                optionsBuilder.UseLoggerFactory(ConsoleLoggerFactory).UseSqlServer("Data Source = (localdb)\\MSSQLLocalDB; Initial Catalog = SamuraiAppTestData");
+                //Continue using this SQL Server provider logic if needed (when no provider is passed in using the options constructor)
+            }
         }
 
 
