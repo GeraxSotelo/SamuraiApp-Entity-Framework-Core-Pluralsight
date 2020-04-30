@@ -4,6 +4,7 @@ using SamuraiApp.Domain;
 using ConsoleApp;
 using Xunit;
 using System.Linq;
+using System.Collections.Generic;
 
 namespace SamuraiApp.Tests
 {
@@ -41,5 +42,34 @@ namespace SamuraiApp.Tests
                 Assert.Equal(1, context2.Samurais.Count());
             }
         }
+
+        [Fact]
+        public void CanGetSamuraiWithQuotes()
+        {
+            int samuraiId;
+            var builder = new DbContextOptionsBuilder();
+            builder.UseInMemoryDatabase("SamuraiWithQuotes");
+
+            using (var seedcontext = new SamuraiContext(builder.Options))
+            {
+                var samuraiGraph = new Samurai { Name = "Kyuzo", Quotes = new List<Quote> { 
+                                                                            new Quote { Text = "hello" }, 
+                                                                            new Quote { Text = "world" } } 
+                };
+
+                seedcontext.Samurais.Add(samuraiGraph);
+                seedcontext.SaveChanges();
+                samuraiId = samuraiGraph.Id;
+            }
+
+            using (var context = new SamuraiContext(builder.Options))
+            {
+                var bizlogic = new BusinessDataLogic(context);
+                var result = bizlogic.GetSamuraiWithQuotes(samuraiId);
+                Assert.Equal(2, result.Quotes.Count);
+            }
+        }
+
+
     }
 }
